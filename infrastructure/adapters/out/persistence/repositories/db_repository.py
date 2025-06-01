@@ -1,35 +1,17 @@
 import time
 import pandas as pd
-from typing import Any, Callable, Tuple, Type, Union
-
+from typing import Any, Callable, Tuple
 from application.ports.out.repository_port import RepositoryPort
-# Asumimos que los conectores estarán disponibles en el path de Python
-# Si están en un subdirectorio relativo, necesitaríamos ajustar el import.
-# Por ahora, asumimos que se pueden importar directamente o se ajustará el PYTHONPATH.
-# from connectors.postgres.postgres_connector import PostgreSQLConnector
-# from connectors.sqlserver.sqlserver_connector import SQLServerConnector
-# Para evitar errores de importación si los conectores no están en el path directo,
-# los pasaremos como tipo en el constructor.
-
-# Definición de un tipo para los conectores
-# DatabaseConnector = Union[Type[PostgreSQLConnector], Type[SQLServerConnector]]
-# Como no podemos importar directamente los conectores aquí sin causar un posible error
-# si la estructura de 'connectors' no está en PYTHONPATH, usaremos 'Any' por ahora
-# y confiaremos en layección de dependencias.
-DatabaseConnectorInstance = Any
-
+from infrastructure.adapters.out.connectors.base_connector import BaseConnector
 
 class DbRepository(RepositoryPort):
     """
     Implementación de RepositoryPort que utiliza un conector de base de datos específico.
     """
-    def __init__(self, connector_instance: DatabaseConnectorInstance):
-        self.connector: DatabaseConnectorInstance = connector_instance
-        if not hasattr(self.connector, 'connect') or \
-           not hasattr(self.connector, 'disconnect') or \
-           not hasattr(self.connector, 'fetch_all_records'):
-            # Esta es una verificación simple. Se podrían añadir más para asegurar compatibilidad.
-            raise TypeError("El conector proporcionado no tiene los métodos esperados.")
+    def __init__(self, connector_instance: BaseConnector):
+        self.connector: BaseConnector = connector_instance
+        # La verificación de métodos se puede omitir si confiamos en la interfaz de BaseConnector
+        # y en que las implementaciones de los conectores la cumplen.
 
     def connect(self, **credentials: Any) -> None:
         self.connector.connect(**credentials)

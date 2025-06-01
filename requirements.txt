@@ -1,0 +1,8 @@
+streamlit
+pandas
+numpy
+psycopg2-binary
+pyodbc
+mysql-connector-python
+ibm_db
+matplotlib

@@ -10,13 +10,37 @@ def get_db_credentials(db_type: str, host: str, port: str, dbname: str, user: st
             "user": user,
             "password": password
         }
-    elif db_type == "SQLServer": # Asumiendo que se reactivará SQLServer
+    elif db_type == "SQLServer":
         return {
             "server": host,
-            "port": int(port) if port else 1433, # Asegurar que el puerto sea entero
+            "port": int(port) if port else 1433,
             "database": dbname,
             "username": user,
             "password": password
-            # Considerar añadir 'driver' si es necesario para SQLServerConnector
+        }
+    elif db_type == "MariaDB":
+        return {
+            "host": host,
+            "port": int(port) if port else 3306,
+            "database": dbname,
+            "user": user,
+            "password": password
+        }
+    elif db_type == "MySQL":
+        return {
+            "host": host,
+            "port": int(port) if port else 3306,
+            "database": dbname,
+            "user": user,
+            "password": password
+        }
+    elif db_type == "DB2":
+        return {
+            "database": dbname,
+            "host": host,
+            "port": int(port) if port else 50000,
+            "protocol": "TCPIP", # Protocolo común para DB2
+            "uid": user,
+            "pwd": password
         }
     return {}
