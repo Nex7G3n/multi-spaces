@@ -1,6 +1,14 @@
 # Multi-Spaces Application
 
+![Captura de pantalla de la aplicación](preview/image.png)
+
 Esta aplicación es una herramienta Streamlit diseñada para gestionar y analizar datos de facturación, clientes, productos y personal, con soporte para múltiples bases de datos.
+
+## Ejecución de la Aplicación
+
+Para iniciar la aplicación Streamlit:
+
+`streamlit run ./app_launcher.py`
 
 ## Estructura del Proyecto
 
@@ -76,13 +84,3 @@ Esta aplicación soporta múltiples bases de datos. Algunos conectores requieren
         *   Edita la variable de sistema `Path` y añade:
             *   `%IBM_DB_HOME%\bin`
         *   Reinicia tu sistema o tu sesión de usuario para que los cambios surtan efecto.
-
-## Ejecución de la Aplicación
-
-Para iniciar la aplicación Streamlit:
-
-`streamlit run infrastructure/adapters/in_/ui/streamlit_app.py`
-
-## Contacto
-
-[Tu nombre/organización] - [Tu correo electrónico/enlace a perfil]
