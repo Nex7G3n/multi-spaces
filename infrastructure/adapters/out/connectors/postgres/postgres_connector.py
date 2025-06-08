@@ -105,11 +105,27 @@ class PostgreSQLConnector(BaseConnector):
                 self.execute_query(query)
                 self.connection.commit()
                 print("DEBUG CONNECTOR: Commit realizado para creación de tabla.")
+                
+                # Specific check for Clientes table after creation
+                if "CREATE TABLE IF NOT EXISTS Clientes" in query:
+                    try:
+                        check_query = """
+                        SELECT column_name
+                        FROM information_schema.columns
+                        WHERE table_name = 'clientes' AND column_name = 'cliente_id';
+                        """
+                        self.cursor.execute(check_query)
+                        result = self.cursor.fetchone()
+                        if not result:
+                            raise RuntimeError("La columna 'cliente_id' no se encontró en la tabla 'Clientes' después de la creación. Verifique el esquema de la base de datos PostgreSQL.")
+                        print("DEBUG CONNECTOR: Verificación de columna 'cliente_id' en 'Clientes' exitosa.")
+                    except Exception as check_e:
+                        print(f"ERROR CONNECTOR: Falló la verificación de la tabla Clientes en PostgreSQL: {check_e}")
+                        raise # Re-lanzar para que el error sea visible
             except Exception as e:
                 print(f"ERROR CONNECTOR al ejecutar query de creación de tabla en PostgreSQL: {e}")
                 self.connection.rollback()
                 print("DEBUG CONNECTOR: Rollback realizado para creación de tabla.")
-
     def create_stored_procedures(self):
         sp_query = """
         DROP FUNCTION IF EXISTS sp_generar_factura(INT, INT, JSONB);
