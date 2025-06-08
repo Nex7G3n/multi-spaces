@@ -71,16 +71,4 @@ Esta aplicación soporta múltiples bases de datos. Algunos conectores requieren
 #### 4. IBM Db2
 
 *   **Driver de Python**: `ibm_db` (ya incluido en `requirements.txt`).
-*   **Requisitos adicionales**: Necesitas instalar el **IBM Db2 ODBC and CLI Driver** y configurar las variables de entorno.
-    1.  **Descarga el controlador CLI**:
-        *   Busca "IBM Db2 ODBC and CLI Driver download" en tu navegador.
-        *   Descarga el archivo `.zip` (ej. `v11.5.x_ntx64_odbc_cli.zip`) para Windows de 64 bits.
-        *   Descomprímelo en una ubicación como `C:\IBM\clidriver`.
-    2.  **Configura las variables de entorno**:
-        *   Abre "Editar las variables de entorno del sistema".
-        *   Crea una nueva variable de sistema:
-            *   `Nombre`: `IBM_DB_HOME`
-            *   `Valor`: `C:\IBM\clidriver` (o la ruta donde lo descomprimiste).
-        *   Edita la variable de sistema `Path` y añade:
-            *   `%IBM_DB_HOME%\bin`
-        *   Reinicia tu sistema o tu sesión de usuario para que los cambios surtan efecto.
+*   **Requisitos adicionales**: El paquete `ibm_db` instala automáticamente el **IBM Db2 ODBC and CLI Driver** dentro del entorno virtual (`venv`). No se requiere configuración manual de variables de entorno del sistema, ya que la aplicación está diseñada para localizar el controlador automáticamente dentro del `venv`.

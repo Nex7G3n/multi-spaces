@@ -1,3 +1,10 @@
+import os
+
+clidriver_path = r"C:\Users\lrosa\Desktop\UNT\C07\ing-software\apps\multi-spaces\venv311\Lib\site-packages\clidriver\bin"
+
+if os.path.exists(clidriver_path):
+    os.add_dll_directory(clidriver_path)
+    
 from infrastructure.adapters.in_.ui.streamlit_app import run_app
 
 

@@ -3,6 +3,7 @@ from datetime import datetime, date
 import json
 import pandas as pd
 import numpy as np
+import ibm_db # Mover la importación a nivel de módulo
 from infrastructure.adapters.out.connectors.base_connector import BaseConnector
 
 class DB2Connector(BaseConnector):
@@ -10,10 +11,9 @@ class DB2Connector(BaseConnector):
         super().__init__(db_type)
 
     def connect(self, database, host, port, protocol, uid, pwd):
-        try:
-            import ibm_db
-        except ImportError:
-            raise RuntimeError("El conector 'ibm_db' no está instalado o el controlador CLI de Db2 no está configurado. Por favor, instala 'ibm_db' (`pip install ibm_db`) y asegúrate de que el controlador CLI de Db2 esté instalado y las variables de entorno (IBM_DB_HOME, PATH) estén configuradas correctamente.")
+        # La importación de ibm_db ahora está a nivel de módulo.
+        # Mantener la verificación de RuntimeError si la importación falla al inicio.
+        # No es necesario un try-except aquí para la importación.
         
         # DSN (Data Source Name) connection string
         conn_str = (
@@ -25,13 +25,11 @@ class DB2Connector(BaseConnector):
             f"PWD={pwd};"
         )
         self.connection = ibm_db.connect(conn_str, "", "") # uid and pwd are in conn_str
-        self.cursor = ibm_db.cursor(self.connection)
 
     def disconnect(self):
         if self.connection:
             ibm_db.close(self.connection)
             self.connection = None
-            self.cursor = None
 
     def execute_query(self, query, params=None):
         start_time = time.time()
