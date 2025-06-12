@@ -43,4 +43,12 @@ def get_db_credentials(db_type: str, host: str, port: str, dbname: str, user: st
             "user": user,
             "password": password,
         }
+    elif db_type == "MongoDB":
+        return {
+            "host": host,
+            "port": int(port) if port else 27017,
+            "database": dbname,
+            "user": user,
+            "password": password,
+        }
     return {}
