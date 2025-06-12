@@ -19,8 +19,9 @@ class SQLServerConnector(BaseConnector):
             f"DRIVER={{ODBC Driver 17 for SQL Server}};"
             f"SERVER={server},{port};"
             f"DATABASE={database};"
-            f"UID={username};"
-            f"PWD={password}"
+            # f"UID={username};"
+            # f"PWD={password}"
+            f"Trusted_Connection=yes;"
         )
         self.connection = pyodbc.connect(conn_str)
         self.cursor = self.connection.cursor()
