@@ -68,12 +68,17 @@ Esta aplicación soporta múltiples bases de datos. Algunos conectores requieren
 *   **Driver de Python**: `mysql-connector-python` (ya incluido en `requirements.txt`).
 *   **Requisitos adicionales**: Generalmente no se requieren instalaciones de controladores nativos adicionales.
 
-#### 4. IBM Db2
+#### 4. MariaDB
+
+*   **Driver de Python**: `mariadb` (ya incluido en `requirements.txt`).
+*   **Requisitos adicionales**: Generalmente no se requieren instalaciones de controladores nativos adicionales.
+
+#### 5. IBM Db2
 
 *   **Driver de Python**: `ibm_db` (ya incluido en `requirements.txt`).
 *   **Requisitos adicionales**: El paquete `ibm_db` instala automáticamente el **IBM Db2 ODBC and CLI Driver** dentro del entorno virtual (`venv`). No se requiere configuración manual de variables de entorno del sistema, ya que la aplicación está diseñada para localizar el controlador automáticamente dentro del `venv`.
 
-#### 5. Oracle XE 11g
+#### 6. Oracle XE 11g
 
 *   **Driver de Python**: `cx_Oracle` (incluido en `requirements.txt`).
 *   **Requisitos adicionales**: Debes tener instalado el cliente de Oracle y configurar correctamente las variables de entorno para que `cx_Oracle` pueda localizar las bibliotecas.

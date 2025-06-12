@@ -18,7 +18,7 @@ def get_db_credentials(db_type: str, host: str, port: str, dbname: str, user: st
             "username": user,
             "password": password
         }
-    elif db_type == "MySQL":
+    elif db_type == "MySQL" or db_type == "MariaDB":
         return {
             "host": host,
             "port": int(port) if port else 3306,
