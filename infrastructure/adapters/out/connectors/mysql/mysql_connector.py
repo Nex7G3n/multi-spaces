@@ -23,7 +23,12 @@ class MySQLConnector(BaseConnector):
             port=port,
             allow_multi_statements=True
         )
-        self.cursor = self.connection.cursor()
+        # mysql-connector-python doesn't accept an 'allow_multi_statements'
+        # connection parameter. Multi-statement execution is handled with
+        # cursor.execute(..., multi=True) when needed. Using a buffered cursor
+        # ensures that results are fully consumed so new queries can execute
+        # without "Commands out of sync" errors.
+        self.cursor = self.connection.cursor(buffered=True)
 
     def disconnect(self):
         if self.connection:
