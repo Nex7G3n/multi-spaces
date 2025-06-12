@@ -69,44 +69,53 @@ def run_app():
 
     st.sidebar.subheader(f"Credenciales para {selected_db_type_sidebar}")
     db_host = st.sidebar.text_input("Host", value=st.session_state.credentials.get("host", "localhost") if st.session_state.credentials else "localhost")
-    
     # Determinar el puerto por defecto
     default_port_map = {
         "PostgreSQL": "5432",
         "SQLServer": "1433",
         "MariaDB": "3306",
         "MySQL": "3306",
-        "DB2": "50000"
+        "DB2": "50000",
+        "OracleXE": "1521",
+        "Oracle19c": "1521"
     }
-    default_port = default_port_map.get(selected_db_type_sidebar, "5432") # Fallback a PostgreSQL
+    default_port = default_port_map.get(selected_db_type_sidebar, "5432")  # Fallback a PostgreSQL
     db_port = st.sidebar.text_input("Puerto", value=str(st.session_state.credentials.get("port", default_port) if st.session_state.credentials else default_port))
-    
+
     # Determinar el nombre de la base de datos por defecto
     default_dbname_map = {
         "PostgreSQL": "postgres",
-        "SQLServer": "master", # O una base de datos común como 'tempdb' o una específica
+        "SQLServer": "master",  # O una base de datos común como 'tempdb' o una específica
         "MariaDB": "test",
         "MySQL": "mysql",
-        "DB2": "SAMPLE" # O una base de datos común como 'SAMPLE'
+        "DB2": "testdb",  # O una base de datos común como 'testdb'
+        "OracleXE": "XE",
+        "Oracle19c": "ORCL"
     }
     default_dbname = default_dbname_map.get(selected_db_type_sidebar, "postgres")
     db_name = st.sidebar.text_input("Base de Datos", value=st.session_state.credentials.get("database", default_dbname) if st.session_state.credentials else default_dbname)
-    
+
     # Determinar el usuario por defecto y el nombre del campo de usuario en las credenciales
     default_user_map = {
         "PostgreSQL": "postgres",
         "SQLServer": "sa",
         "MariaDB": "root",
         "MySQL": "root",
-        "DB2": "db2inst1" # O un usuario común para DB2
+        "DB2": "db2inst1",  # O un usuario común para DB2
+        "OracleXE": "system",  # O sys en caso de conexión como sysdba
+        "Oracle19c": "sys"  # Con as sysdba en caso de conexión a Oracle 19c
     }
+
     user_field_name_map = {
         "PostgreSQL": "user",
         "SQLServer": "username",
         "MariaDB": "user",
         "MySQL": "user",
-        "DB2": "uid"
+        "DB2": "uid",
+        "OracleXE": "username",  # Puede ser system o sys dependiendo de la conexión
+        "Oracle19c": "username"  # Puede ser sys con 'as sysdba' o system
     }
+
     default_user = default_user_map.get(selected_db_type_sidebar, "postgres")
     user_field_in_creds = user_field_name_map.get(selected_db_type_sidebar, "user")
     db_user = st.sidebar.text_input("Usuario", value=st.session_state.credentials.get(user_field_in_creds, default_user) if st.session_state.credentials else default_user)

@@ -1,6 +1,6 @@
 import os
 
-clidriver_path = r"C:\Users\Kelita\Desktop\multi-spaces\venv\Lib\site-packages\clidriver\bin"
+clidriver_path = r"C:\Users\Ar1m4K3y\Desktop\homespace\multi-spaces\.venv\Lib\site-packages\clidriver\bin"
 
 if os.path.exists(clidriver_path):
     os.add_dll_directory(clidriver_path)
