@@ -21,7 +21,6 @@ class MySQLConnector(BaseConnector):
             user=user,
             password=password,
             port=port,
-            allow_multi_statements=True
         )
         # mysql-connector-python doesn't accept an 'allow_multi_statements'
         # connection parameter. Multi-statement execution is handled with
