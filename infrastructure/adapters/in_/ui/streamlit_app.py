@@ -5,6 +5,7 @@ from infrastructure.adapters.out.connectors.oracle.oracle_connector import Oracl
 from infrastructure.adapters.out.connectors.mysql.mysql_connector import MySQLConnector
 from infrastructure.adapters.out.connectors.mariadb.mariadb_connector import MariaDBConnector
 from infrastructure.adapters.out.connectors.db2.db2_connector import DB2Connector
+from infrastructure.adapters.out.connectors.mongodb.mongodb_connector import MongoDBConnector
 from infrastructure.adapters.out.persistence.repositories.db_repository import DbRepository
 from infrastructure.adapters.out.persistence.utils.db_credentials_helper import get_db_credentials
 from application.services.entity_service import EntityService
@@ -26,7 +27,7 @@ except ImportError as e:
     st.stop()
 
 
-AVAILABLE_DB_TYPES = ("PostgreSQL", "SQLServer", "Oracle", "DB2", "MySQL", "MariaDB")
+AVAILABLE_DB_TYPES = ("PostgreSQL", "SQLServer", "Oracle", "DB2", "MySQL", "MariaDB", "MongoDB")
 
 def initialize_services(db_connector_instance):
     """Inicializa y devuelve los servicios de aplicación."""
@@ -79,7 +80,8 @@ def run_app():
         "MariaDB": "3306",
         "DB2": "50000",
         "OracleXE": "1521",
-        "Oracle19c": "1521"
+        "Oracle19c": "1521",
+        "MongoDB": "27017"
     }
     default_port = default_port_map.get(selected_db_type_sidebar, "5432")  # Fallback a PostgreSQL
     db_port = st.sidebar.text_input("Puerto", value=str(st.session_state.credentials.get("port", default_port) if st.session_state.credentials else default_port))
@@ -91,9 +93,10 @@ def run_app():
         "Oracle": "XE",
         "MySQL": "mysql",
         "MariaDB": "mysql",
-        "DB2": "testdb",   # O una base de datos común como 'testdb'
+        "DB2": "testdb", ,  # O una base de datos común como 'testdb'
         "OracleXE": "XE",
         "Oracle19c": "ORCL"
+        "MongoDB": "admin"
     }
     default_dbname = default_dbname_map.get(selected_db_type_sidebar, "postgres")
     db_name = st.sidebar.text_input("Base de Datos", value=st.session_state.credentials.get("database", default_dbname) if st.session_state.credentials else default_dbname)
@@ -105,9 +108,10 @@ def run_app():
         "Oracle": "system",
         "MySQL": "root",
         "MariaDB": "root",
-        "DB2": "db2inst1",   # O un usuario común para DB2
+        "DB2": "db2inst1", ,  # O un usuario común para DB2
         "OracleXE": "system",  # O sys en caso de conexión como sysdba
         "Oracle19c": "sys"  # Con as sysdba en caso de conexión a Oracle 19c
+        "MongoDB": "root"
     }
 
     user_field_name_map = {
@@ -117,6 +121,7 @@ def run_app():
         "MySQL": "user",
         "MariaDB": "user",
         "DB2": "uid",
+        "MongoDB": "user",
         "OracleXE": "username",  # Puede ser system o sys dependiendo de la conexión
         "Oracle19c": "username"  # Puede ser sys con 'as sysdba' o system
     }
@@ -146,6 +151,8 @@ def run_app():
             connector_instance_to_use = MariaDBConnector()
         elif selected_db_type_sidebar == "DB2":
             connector_instance_to_use = DB2Connector()
+        elif selected_db_type_sidebar == "MongoDB":
+            connector_instance_to_use = MongoDBConnector()
         
         if connector_instance_to_use:
             st.session_state.db_connector_instance = connector_instance_to_use
