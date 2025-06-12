@@ -18,14 +18,6 @@ def get_db_credentials(db_type: str, host: str, port: str, dbname: str, user: st
             "username": user,
             "password": password
         }
-    elif db_type == "MariaDB":
-        return {
-            "host": host,
-            "port": int(port) if port else 3306,
-            "database": dbname,
-            "user": user,
-            "password": password
-        }
     elif db_type == "MySQL":
         return {
             "host": host,
@@ -42,5 +34,13 @@ def get_db_credentials(db_type: str, host: str, port: str, dbname: str, user: st
             "protocol": "TCPIP", # Protocolo común para DB2
             "uid": user,
             "pwd": password
+        }
+    elif db_type == "Oracle":
+        return {
+            "host": host,
+            "port": int(port) if port else 1521,
+            "service_name": dbname,
+            "user": user,
+            "password": password,
         }
     return {}

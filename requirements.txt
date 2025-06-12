@@ -5,4 +5,5 @@ psycopg2-binary
 pyodbc
 mysql-connector-python
 ibm_db
+cx_Oracle
 matplotlib
