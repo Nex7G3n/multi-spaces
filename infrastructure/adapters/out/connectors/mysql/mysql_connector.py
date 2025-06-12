@@ -22,7 +22,12 @@ class MySQLConnector(BaseConnector):
             password=password,
             port=port
         )
-        self.cursor = self.connection.cursor()
+        # mysql-connector-python doesn't accept an 'allow_multi_statements'
+        # connection parameter. Multi-statement execution is handled with
+        # cursor.execute(..., multi=True) when needed. Using a buffered cursor
+        # ensures that results are fully consumed so new queries can execute
+        # without "Commands out of sync" errors.
+        self.cursor = self.connection.cursor(buffered=True)
 
     def disconnect(self):
         if self.connection:
@@ -189,10 +194,15 @@ class MySQLConnector(BaseConnector):
         DELIMITER ;
         """
         sp_query_cleaned = sp_query.replace('DELIMITER //', '').replace('DELIMITER ;', '').strip()
-        
+
         try:
             print(f"DEBUG CONNECTOR: Ejecutando query de creación de SP en MySQL: {sp_query_cleaned[:100]}...")
-            self.cursor.execute(sp_query_cleaned)
+
+            for _ in self.cursor.execute(sp_query_cleaned, multi=True):
+                # Consumir todos los resultados intermedios de cada sentencia para
+                # prevenir errores 'Commands out of sync'
+                pass
+
             self.connection.commit()
             print("DEBUG CONNECTOR: Commit realizado para creación de SP.")
         except Exception as e:
