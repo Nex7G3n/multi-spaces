@@ -20,8 +20,7 @@ class MySQLConnector(BaseConnector):
             database=database,
             user=user,
             password=password,
-            port=port,
-            allow_multi_statements=True
+            port=port
         )
         self.cursor = self.connection.cursor()
 
