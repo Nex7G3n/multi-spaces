@@ -8,3 +8,4 @@ ibm_db
 cx_Oracle
 matplotlib
 mariadb
+pymongo
