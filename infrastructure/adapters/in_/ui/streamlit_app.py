@@ -1,7 +1,7 @@
 import streamlit as st
 from infrastructure.adapters.out.connectors.postgres.postgres_connector import PostgreSQLConnector
 from infrastructure.adapters.out.connectors.sqlserver.sqlserver_connector import SQLServerConnector
-from infrastructure.adapters.out.connectors.mariadb.mariadb_connector import MariaDBConnector
+from infrastructure.adapters.out.connectors.oracle.oracle_connector import OracleConnector
 from infrastructure.adapters.out.connectors.mysql.mysql_connector import MySQLConnector
 from infrastructure.adapters.out.connectors.db2.db2_connector import DB2Connector
 from infrastructure.adapters.out.persistence.repositories.db_repository import DbRepository
@@ -25,7 +25,7 @@ except ImportError as e:
     st.stop()
 
 
-AVAILABLE_DB_TYPES = ("PostgreSQL", "SQLServer", "MariaDB", "DB2", "MySQL")
+AVAILABLE_DB_TYPES = ("PostgreSQL", "SQLServer", "Oracle", "DB2", "MySQL")
 
 def initialize_services(db_connector_instance):
     """Inicializa y devuelve los servicios de aplicación."""
@@ -74,7 +74,7 @@ def run_app():
     default_port_map = {
         "PostgreSQL": "5432",
         "SQLServer": "1433",
-        "MariaDB": "3306",
+        "Oracle": "1521",
         "MySQL": "3306",
         "DB2": "50000"
     }
@@ -84,10 +84,10 @@ def run_app():
     # Determinar el nombre de la base de datos por defecto
     default_dbname_map = {
         "PostgreSQL": "postgres",
-        "SQLServer": "master", # O una base de datos común como 'tempdb' o una específica
-        "MariaDB": "test",
+        "SQLServer": "master",  # O una base de datos común como 'tempdb' o una específica
+        "Oracle": "XE",
         "MySQL": "mysql",
-        "DB2": "SAMPLE" # O una base de datos común como 'SAMPLE'
+        "DB2": "SAMPLE"  # O una base de datos común como 'SAMPLE'
     }
     default_dbname = default_dbname_map.get(selected_db_type_sidebar, "postgres")
     db_name = st.sidebar.text_input("Base de Datos", value=st.session_state.credentials.get("database", default_dbname) if st.session_state.credentials else default_dbname)
@@ -96,14 +96,14 @@ def run_app():
     default_user_map = {
         "PostgreSQL": "postgres",
         "SQLServer": "sa",
-        "MariaDB": "root",
+        "Oracle": "system",
         "MySQL": "root",
-        "DB2": "db2inst1" # O un usuario común para DB2
+        "DB2": "db2inst1"  # O un usuario común para DB2
     }
     user_field_name_map = {
         "PostgreSQL": "user",
         "SQLServer": "username",
-        "MariaDB": "user",
+        "Oracle": "user",
         "MySQL": "user",
         "DB2": "uid"
     }
@@ -124,8 +124,8 @@ def run_app():
             connector_instance_to_use = PostgreSQLConnector()
         elif selected_db_type_sidebar == "SQLServer":
             connector_instance_to_use = SQLServerConnector()
-        elif selected_db_type_sidebar == "MariaDB":
-            connector_instance_to_use = MariaDBConnector()
+        elif selected_db_type_sidebar == "Oracle":
+            connector_instance_to_use = OracleConnector()
         elif selected_db_type_sidebar == "MySQL":
             connector_instance_to_use = MySQLConnector()
         elif selected_db_type_sidebar == "DB2":

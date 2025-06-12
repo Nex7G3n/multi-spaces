@@ -51,11 +51,16 @@ class MySQLConnector(BaseConnector):
             query = f"CALL {sp_name}({param_placeholders})"
             
             self.cursor.execute(query, params)
-            
+
             result = None
             if self.cursor.description:
                 result = self.cursor.fetchone()
-            
+
+            # Consumir posibles resultados adicionales para evitar
+            # "Commands out of sync" en conexiones MySQL
+            while self.cursor.nextset():
+                pass
+
             execution_time = (time.time() - start_time) * 1000  # ms
             return result, execution_time
         except Exception as e:
