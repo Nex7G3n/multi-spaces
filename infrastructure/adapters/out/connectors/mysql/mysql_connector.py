@@ -20,7 +20,8 @@ class MySQLConnector(BaseConnector):
             database=database,
             user=user,
             password=password,
-            port=port
+            port=port,
+            allow_multi_statements=True
         )
         self.cursor = self.connection.cursor()
 
@@ -189,10 +190,15 @@ class MySQLConnector(BaseConnector):
         DELIMITER ;
         """
         sp_query_cleaned = sp_query.replace('DELIMITER //', '').replace('DELIMITER ;', '').strip()
-        
+
         try:
             print(f"DEBUG CONNECTOR: Ejecutando query de creación de SP en MySQL: {sp_query_cleaned[:100]}...")
-            self.cursor.execute(sp_query_cleaned)
+
+            for _ in self.cursor.execute(sp_query_cleaned, multi=True):
+                # Consumir todos los resultados intermedios de cada sentencia para
+                # prevenir errores 'Commands out of sync'
+                pass
+
             self.connection.commit()
             print("DEBUG CONNECTOR: Commit realizado para creación de SP.")
         except Exception as e:
