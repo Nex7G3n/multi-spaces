@@ -63,7 +63,7 @@ Esta aplicación soporta múltiples bases de datos. Algunos conectores requieren
     *   Descárgalo desde la página oficial de Microsoft: [https://docs.microsoft.com/es-es/sql/connect/odbc/download-odbc-driver-for-sql-server](https://docs.microsoft.com/es-es/sql/connect/odbc/download-odbc-driver-for-sql-server)
     *   Asegúrate de instalar la versión adecuada para tu sistema operativo (ej. Windows de 64 bits).
 
-#### 3. MariaDB / MySQL
+#### 3. MySQL
 
 *   **Driver de Python**: `mysql-connector-python` (ya incluido en `requirements.txt`).
 *   **Requisitos adicionales**: Generalmente no se requieren instalaciones de controladores nativos adicionales.
@@ -72,3 +72,8 @@ Esta aplicación soporta múltiples bases de datos. Algunos conectores requieren
 
 *   **Driver de Python**: `ibm_db` (ya incluido en `requirements.txt`).
 *   **Requisitos adicionales**: El paquete `ibm_db` instala automáticamente el **IBM Db2 ODBC and CLI Driver** dentro del entorno virtual (`venv`). No se requiere configuración manual de variables de entorno del sistema, ya que la aplicación está diseñada para localizar el controlador automáticamente dentro del `venv`.
+
+#### 5. Oracle XE 11g
+
+*   **Driver de Python**: `cx_Oracle` (incluido en `requirements.txt`).
+*   **Requisitos adicionales**: Debes tener instalado el cliente de Oracle y configurar correctamente las variables de entorno para que `cx_Oracle` pueda localizar las bibliotecas.
