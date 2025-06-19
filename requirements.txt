@@ -8,3 +8,4 @@ ibm_db
 matplotlib
 pymongo
 redis
+cassandra-driver
