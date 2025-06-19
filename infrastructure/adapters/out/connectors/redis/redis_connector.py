@@ -96,6 +96,8 @@ class RedisConnector(BaseConnector):
                 return self.client.lrange(key, start, end)
             elif command == "DELETE":
                 keys = args
+                if not keys:
+                    raise ValueError("El comando DELETE requiere al menos una clave.")
                 return self.client.delete(*keys)
             elif command == "EXISTS":
                 key = args[0]
