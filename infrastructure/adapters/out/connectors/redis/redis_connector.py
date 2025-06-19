@@ -227,6 +227,56 @@ class RedisConnector(BaseConnector):
         # Ejemplo muy simplificado: asume que el script no necesita KEYS y solo ARGV
         return self.client.eval(script, 0, *args)
 
+    def search_client(self, client_id: int = 1) -> Tuple[Any, float]:
+        key = f"clientes:{client_id}"
+        return self.measure_time("search_client", self.client.hgetall, key)
+
+    def search_product(self, product_id: int = 1) -> Tuple[Any, float]:
+        key = f"productos:{product_id}"
+        return self.measure_time("search_product", self.client.hgetall, key)
+
+    def generate_invoice(self, client_id: int, staff_id: int, products_json_str: str) -> Tuple[Any, float]:
+        def _generate():
+            products = json.loads(products_json_str)
+            invoice_id = self.client.incr("facturas:next_id")
+            invoice_key = f"facturas:{invoice_id}"
+
+            total = 0.0
+            self.client.hset(
+                invoice_key,
+                mapping={
+                    "id": str(invoice_id),
+                    "cliente_id": str(client_id),
+                    "personal_id": str(staff_id),
+                    "fecha": "2023-01-01",
+                    "total": "0",
+                },
+            )
+
+            for item in products:
+                prod = self.client.hgetall(f"productos:{item.get('producto_id')}")
+                precio = float(prod.get("precio", 0))
+                cantidad = float(item.get("cantidad", 0))
+                subtotal = precio * cantidad
+                detail_id = self.client.incr("detalles_factura:next_id")
+                detail_key = f"detalles_factura:{detail_id}"
+                self.client.hset(
+                    detail_key,
+                    mapping={
+                        "id": str(detail_id),
+                        "factura_id": str(invoice_id),
+                        "producto_id": str(item.get("producto_id")),
+                        "cantidad": str(cantidad),
+                        "precio_unitario": str(precio),
+                    },
+                )
+                total += subtotal
+
+            self.client.hset(invoice_key, mapping={"total": str(total)})
+            return {"factura_id": invoice_id, "total": total}
+
+        return self.measure_time("generate_invoice", _generate)
+
     def insert_data(self, table_name: str, data: Dict[str, Any]):
         # En Redis, esto podría ser HMSET para HASHes o LPUSH para LISTAs, etc.
         # Asumimos que 'table_name' es un prefijo de clave y 'data' es un diccionario para un HASH.
