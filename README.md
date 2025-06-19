@@ -77,3 +77,8 @@ Esta aplicación soporta múltiples bases de datos. Algunos conectores requieren
 
 *   **Driver de Python**: `cx_Oracle` (incluido en `requirements.txt`).
 *   **Requisitos adicionales**: Debes tener instalado el cliente de Oracle y configurar correctamente las variables de entorno para que `cx_Oracle` pueda localizar las bibliotecas.
+
+#### 6. Cassandra
+
+*   **Driver de Python**: `cassandra-driver` (ya incluido en `requirements.txt`).
+*   **Requisitos adicionales**: No se requieren pasos extra para un clúster local de pruebas.

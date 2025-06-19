@@ -96,7 +96,9 @@ class RedisConnector(BaseConnector):
                 return self.client.lrange(key, start, end)
             elif command == "DELETE":
                 keys = args
-                return self.client.delete(*keys)
+                if keys:
+                    return self.client.delete(*keys)
+                return 0
             elif command == "EXISTS":
                 key = args[0]
                 return self.client.exists(key)
@@ -352,11 +354,10 @@ class RedisConnector(BaseConnector):
         
         # Limpiar datos existentes para evitar duplicados en cada ejecución
         self.client.delete("clientes:next_id", "productos:next_id", "personal:next_id", "facturas:next_id", "detalles_factura:next_id")
-        self.client.delete(*self.client.keys("clientes:*"))
-        self.client.delete(*self.client.keys("productos:*"))
-        self.client.delete(*self.client.keys("personal:*"))
-        self.client.delete(*self.client.keys("facturas:*"))
-        self.client.delete(*self.client.keys("detalles_factura:*"))
+        for pattern in ["clientes:*", "productos:*", "personal:*", "facturas:*", "detalles_factura:*"]:
+            keys = self.client.keys(pattern)
+            if keys:
+                self.client.delete(*keys)
 
         # Datos de Clientes
         for i in range(1, num_records_per_table + 1):
