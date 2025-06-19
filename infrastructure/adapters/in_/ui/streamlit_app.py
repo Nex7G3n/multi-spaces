@@ -16,6 +16,7 @@ from infrastructure.adapters.in_.ui.views.maintainers_view import maintainers_ta
 from infrastructure.adapters.in_.ui.views.performance_view import performance_test_view
 from infrastructure.adapters.in_.ui.views.results_view import results_tab_view
 from infrastructure.adapters.in_.ui.views.billing_view import billing_tab_view
+from infrastructure.adapters.in_.ui.views.multi_spaces_view import multi_spaces_tab_view
 
 st.set_page_config(page_title="Comparación de Bases de Datos", layout="wide")
 
@@ -160,9 +161,10 @@ def run_app():
         st.error("Los servicios de aplicación no se inicializaron correctamente. Intente reconectar.")
         return
 
-    tab_mantenedores, tab_pruebas, tab_resultados, tab_facturacion = st.tabs([
+    tab_mantenedores, tab_pruebas, tab_multi, tab_resultados, tab_facturacion = st.tabs([
         "Mantenedores",
         "Ejecutar Pruebas de Rendimiento",
+        "Multi-Spaces",
         "Resultados y Estadísticas",
         "Proceso de Facturación"
     ])
@@ -172,6 +174,9 @@ def run_app():
 
     with tab_pruebas:
         performance_test_view(st.session_state.performance_service, st.session_state.db_type_selected)
+
+    with tab_multi:
+        multi_spaces_tab_view(DB_DEFAULTS)
 
     with tab_resultados:
         results_tab_view(st.session_state.performance_service)

@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
+from cassandra.io.asyncioreactor import AsyncioConnection
 import pandas as pd
 from infrastructure.adapters.out.connectors.base_connector import BaseConnector
 
@@ -17,7 +18,12 @@ class CassandraConnector(BaseConnector):
 
     def connect(self, host, database, user, password, port):
         auth_provider = PlainTextAuthProvider(username=user, password=password)
-        self.cluster = Cluster([host], port=port, auth_provider=auth_provider)
+        self.cluster = Cluster(
+            [host],
+            port=port,
+            auth_provider=auth_provider,
+            connection_class=AsyncioConnection
+        )
         self.session = self.cluster.connect()
         self.session.execute(
             f"CREATE KEYSPACE IF NOT EXISTS {database} WITH replication = {{'class': 'SimpleStrategy', 'replication_factor': 1}}"
