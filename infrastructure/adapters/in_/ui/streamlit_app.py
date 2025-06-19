@@ -1,9 +1,10 @@
 import streamlit as st
+import json
+from pathlib import Path
 from infrastructure.adapters.out.connectors.postgres.postgres_connector import PostgreSQLConnector
 from infrastructure.adapters.out.connectors.sqlserver.sqlserver_connector import SQLServerConnector
 from infrastructure.adapters.out.connectors.oracle.oracle_connector import OracleConnector
 from infrastructure.adapters.out.connectors.mysql.mysql_connector import MySQLConnector
-from infrastructure.adapters.out.connectors.mariadb.mariadb_connector import MariaDBConnector
 from infrastructure.adapters.out.connectors.db2.db2_connector import DB2Connector
 from infrastructure.adapters.out.connectors.mongodb.mongodb_connector import MongoDBConnector
 from infrastructure.adapters.out.persistence.repositories.db_repository import DbRepository
@@ -20,14 +21,20 @@ st.set_page_config(page_title="Comparación de Bases de Datos", layout="wide")
 
 st.sidebar.write(f"Streamlit Version: {st.__version__}")
 
+# Cargar credenciales por defecto desde el archivo JSON en la raíz del proyecto
+DEFAULT_CREDENTIALS_FILE = Path(__file__).resolve().parents[4] / "default_db_credentials.json"
+with open(DEFAULT_CREDENTIALS_FILE, "r") as f:
+    DB_DEFAULTS = json.load(f)
+
+AVAILABLE_DB_TYPES = tuple(DB_DEFAULTS.keys())
+
 try:
-    pass 
+    pass
 except ImportError as e:
     st.error(f"Error crítico al importar conectores: {e}. Verifique la configuración de PYTHONPATH y la estructura del proyecto.")
     st.stop()
 
 
-AVAILABLE_DB_TYPES = ("PostgreSQL", "SQLServer", "Oracle", "DB2", "MySQL", "MariaDB", "MongoDB")
 
 def initialize_services(db_connector_instance):
     """Inicializa y devuelve los servicios de aplicación."""
@@ -72,56 +79,20 @@ def run_app():
     st.sidebar.subheader(f"Credenciales para {selected_db_type_sidebar}")
     db_host = st.sidebar.text_input("Host", value=st.session_state.credentials.get("host", "localhost") if st.session_state.credentials else "localhost")
     
-    # Determinar el puerto por defecto
-    default_port_map = {
-        "PostgreSQL": "5432",
-        "SQLServer": "1433",
-        "Oracle": "1521",
-        "MySQL": "3306",
-        "MariaDB": "3306",
-        "DB2": "50000",
-        "MongoDB": "27017"
-    }
-    default_port = default_port_map.get(selected_db_type_sidebar, "5432") # Fallback a PostgreSQL
+    # Obtener valores por defecto desde el archivo de configuración
+    defaults = DB_DEFAULTS.get(selected_db_type_sidebar, DB_DEFAULTS.get("PostgreSQL"))
+    default_port = str(defaults.get("port", 5432))
     db_port = st.sidebar.text_input("Puerto", value=str(st.session_state.credentials.get("port", default_port) if st.session_state.credentials else default_port))
-    
-    # Determinar el nombre de la base de datos por defecto
-    default_dbname_map = {
-        "PostgreSQL": "postgres",
-        "SQLServer": "master",  # O una base de datos común como 'tempdb' o una específica
-        "Oracle": "XE",
-        "MySQL": "mysql",
-        "MariaDB": "mysql",
-        "DB2": "SAMPLE",  # O una base de datos común como 'SAMPLE'
-        "MongoDB": "admin"
-    }
-    default_dbname = default_dbname_map.get(selected_db_type_sidebar, "postgres")
+
+    default_dbname = defaults.get("database", "postgres")
     db_name = st.sidebar.text_input("Base de Datos", value=st.session_state.credentials.get("database", default_dbname) if st.session_state.credentials else default_dbname)
-    
-    # Determinar el usuario por defecto y el nombre del campo de usuario en las credenciales
-    default_user_map = {
-        "PostgreSQL": "postgres",
-        "SQLServer": "sa",
-        "Oracle": "system",
-        "MySQL": "root",
-        "MariaDB": "root",
-        "DB2": "db2inst1",  # O un usuario común para DB2
-        "MongoDB": "root"
-    }
-    user_field_name_map = {
-        "PostgreSQL": "user",
-        "SQLServer": "username",
-        "Oracle": "user",
-        "MySQL": "user",
-        "MariaDB": "user",
-        "DB2": "uid",
-        "MongoDB": "user"
-    }
-    default_user = default_user_map.get(selected_db_type_sidebar, "postgres")
-    user_field_in_creds = user_field_name_map.get(selected_db_type_sidebar, "user")
+
+    default_user = defaults.get("user", "postgres")
+    user_field_in_creds = defaults.get("user_field", "user")
     db_user = st.sidebar.text_input("Usuario", value=st.session_state.credentials.get(user_field_in_creds, default_user) if st.session_state.credentials else default_user)
     
-    db_password = st.sidebar.text_input("Contraseña", type="password", value=st.session_state.credentials.get("password", "") if st.session_state.credentials else "")
+    default_password = defaults.get("password", "")
+    db_password = st.sidebar.text_input("Contraseña", type="password", value=st.session_state.credentials.get("password", default_password) if st.session_state.credentials else default_password)
 
     if st.sidebar.button("Conectar y Configurar Base de Datos"):
         st.session_state.db_type_selected = selected_db_type_sidebar
@@ -138,8 +109,6 @@ def run_app():
             connector_instance_to_use = OracleConnector()
         elif selected_db_type_sidebar == "MySQL":
             connector_instance_to_use = MySQLConnector()
-        elif selected_db_type_sidebar == "MariaDB":
-            connector_instance_to_use = MariaDBConnector()
         elif selected_db_type_sidebar == "DB2":
             connector_instance_to_use = DB2Connector()
         elif selected_db_type_sidebar == "MongoDB":
