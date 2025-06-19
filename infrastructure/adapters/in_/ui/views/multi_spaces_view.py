@@ -9,6 +9,7 @@ from infrastructure.adapters.out.persistence.repositories.db_repository import D
 from infrastructure.adapters.out.persistence.utils.db_credentials_helper import get_db_credentials
 from application.services.performance_service import PerformanceService
 from shared.performance_data import clear_performance_data
+from infrastructure.adapters.in_.ui.views.results_view import render_performance_results
 
 CONNECTOR_MAP = {
     "PostgreSQL": PostgreSQLConnector,
@@ -42,6 +43,7 @@ def multi_spaces_tab_view(defaults: dict):
             ("Consulta de factura", "query_invoice"),
             ("Reporte de ventas", "sales_report"),
         ]
+        last_repo = None
         for db_type, db_creds in creds.items():
             connector_cls = CONNECTOR_MAP.get(db_type)
             if not connector_cls:
@@ -51,6 +53,7 @@ def multi_spaces_tab_view(defaults: dict):
             try:
                 connector.connect(**db_creds)
                 repo = DbRepository(connector_instance=connector)
+                last_repo = repo
                 repo.create_tables()
                 repo.create_stored_procedures()
                 repo.generate_test_data()
@@ -64,4 +67,8 @@ def multi_spaces_tab_view(defaults: dict):
                     connector.disconnect()
                 except Exception:
                     pass
-        st.info("Pruebas finalizadas. Revise la pestaña 'Resultados y Estadísticas'.")
+
+        st.info("Pruebas finalizadas. Resultados a continuación:")
+        if last_repo:
+            perf_service_summary = PerformanceService(last_repo)
+            render_performance_results(perf_service_summary)
