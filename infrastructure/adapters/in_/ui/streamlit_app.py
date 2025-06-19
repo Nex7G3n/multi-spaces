@@ -5,6 +5,7 @@ from infrastructure.adapters.out.connectors.postgres.postgres_connector import P
 from infrastructure.adapters.out.connectors.sqlserver.sqlserver_connector import SQLServerConnector
 from infrastructure.adapters.out.connectors.mysql.mysql_connector import MySQLConnector
 from infrastructure.adapters.out.connectors.mongodb.mongodb_connector import MongoDBConnector
+from infrastructure.adapters.out.connectors.redis.redis_connector import RedisConnector
 from infrastructure.adapters.out.persistence.repositories.db_repository import DbRepository
 from infrastructure.adapters.out.persistence.utils.db_credentials_helper import get_db_credentials
 from application.services.entity_service import EntityService
@@ -27,7 +28,12 @@ with open(DEFAULT_CREDENTIALS_FILE, "r") as f:
 AVAILABLE_DB_TYPES = tuple(DB_DEFAULTS.keys())
 
 try:
-    pass
+    # Asegurarse de que todos los conectores se puedan importar
+    from infrastructure.adapters.out.connectors.postgres.postgres_connector import PostgreSQLConnector
+    from infrastructure.adapters.out.connectors.sqlserver.sqlserver_connector import SQLServerConnector
+    from infrastructure.adapters.out.connectors.mysql.mysql_connector import MySQLConnector
+    from infrastructure.adapters.out.connectors.mongodb.mongodb_connector import MongoDBConnector
+    from infrastructure.adapters.out.connectors.redis.redis_connector import RedisConnector
 except ImportError as e:
     st.error(f"Error crítico al importar conectores: {e}. Verifique la configuración de PYTHONPATH y la estructura del proyecto.")
     st.stop()
@@ -107,6 +113,8 @@ def run_app():
             connector_instance_to_use = MySQLConnector()
         elif selected_db_type_sidebar == "MongoDB":
             connector_instance_to_use = MongoDBConnector()
+        elif selected_db_type_sidebar == "Redis":
+            connector_instance_to_use = RedisConnector()
         
         if connector_instance_to_use:
             st.session_state.db_connector_instance = connector_instance_to_use

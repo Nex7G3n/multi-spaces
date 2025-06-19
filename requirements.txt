@@ -7,3 +7,4 @@ mysql-connector-python
 ibm_db
 matplotlib
 pymongo
+redis
