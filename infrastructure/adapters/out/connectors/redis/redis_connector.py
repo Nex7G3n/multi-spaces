@@ -14,17 +14,24 @@ class RedisConnector(BaseConnector):
         self.password = None
         self.db = None
 
-    def connect(self, host: str, port: int, password: str = "", db: int = 0, **kwargs):
-        self.host = host
-        self.port = port
-        self.password = password
-        self.db = db
+    def connect(self, **kwargs: Any) -> None:
+        self.host = kwargs.get("host")
+        self.port = kwargs.get("port")
+        self.password = kwargs.get("password", "")
+        self.db = kwargs.get("database", 0)
+        
+        if self.host is None or self.host == "":
+            raise ValueError("El host de Redis no puede ser None o vacío.")
+        # El puerto ya debería ser un int o None si no se proporcionó en db_credentials_helper
+        if self.port is None:
+            raise ValueError("El puerto de Redis no puede ser None.")
+
         try:
             self.client = redis.StrictRedis(
-                host=self.host,
-                port=self.port,
+                host=str(self.host),
+                port=self.port, # Ya es int o None, validado arriba
                 password=self.password if self.password else None,
-                db=self.db,
+                db=self.db, # Ya es int o 0
                 decode_responses=True
             )
             self.client.ping()
@@ -339,7 +346,8 @@ class RedisConnector(BaseConnector):
         last_id = self.client.get(f"{table_name}:next_id")
         return int(last_id) - 1 if last_id else None
 
-    def generate_test_data(self, num_records_per_table: int = 10):
+    def generate_test_data(self) -> None:
+        num_records_per_table = 10 # Valor por defecto
         print(f"Generando datos de prueba para Redis (simulado, {num_records_per_table} registros por 'tabla')...")
         
         # Limpiar datos existentes para evitar duplicados en cada ejecución
@@ -381,8 +389,9 @@ class RedisConnector(BaseConnector):
 
         # Datos de Facturas y Detalles de Factura (simulados)
         for i in range(1, num_records_per_table + 1):
+            invoice_id = self.client.incr("facturas:next_id") # Definir invoice_id
             invoice_data = {
-                "id": str(i),
+                "id": str(invoice_id),
                 "cliente_id": str(i),
                 "personal_id": str(i),
                 "fecha": "2023-01-01",
@@ -390,16 +399,22 @@ class RedisConnector(BaseConnector):
             }
             self.insert_data("facturas", invoice_data)
 
-            detail_data = {
-                "id": str(detail_id),
-                "factura_id": str(invoice_id),
-                "producto_id": str(p["producto_id"]),
-                "cantidad": str(p["cantidad"]),
-                "precio_unitario": str(self.search_product(p["producto_id"])[0].get("precio", 0))
-            }
-            self.insert_data("detalles_factura", detail_data)
+            # Simular algunos detalles de factura para cada factura
+            for j in range(1, 3): # 2 detalles por factura
+                detail_id = self.client.incr("detalles_factura:next_id") # Definir detail_id
+                product_id = (i + j) % num_records_per_table + 1 # Asegurar que el producto exista
+                product_price = float(self.search_product(product_id)[0].get("precio", 0))
+                quantity = j * 10
+                detail_data = {
+                    "id": str(detail_id),
+                    "factura_id": str(invoice_id),
+                    "producto_id": str(product_id),
+                    "cantidad": str(quantity),
+                    "precio_unitario": str(product_price)
+                }
+                self.insert_data("detalles_factura", detail_data)
         
-        return invoice_data, 0.0 # Return 0.0 for execution time for now
+        return None
 
     def query_invoice(self, invoice_id: int) -> Tuple[Any, float]:
         key = f"facturas:{invoice_id}"

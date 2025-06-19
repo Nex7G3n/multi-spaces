@@ -51,4 +51,11 @@ def get_db_credentials(db_type: str, host: str, port: str, dbname: str, user: st
             "user": user,
             "password": password,
         }
+    elif db_type == "Redis":
+        return {
+            "host": host,
+            "port": int(port) if port else 6379, # Puerto por defecto de Redis
+            "password": password,
+            "database": int(dbname) if dbname else 0 # DB por defecto de Redis
+        }
     return {}
