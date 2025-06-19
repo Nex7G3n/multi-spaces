@@ -3,9 +3,7 @@ import json
 from pathlib import Path
 from infrastructure.adapters.out.connectors.postgres.postgres_connector import PostgreSQLConnector
 from infrastructure.adapters.out.connectors.sqlserver.sqlserver_connector import SQLServerConnector
-from infrastructure.adapters.out.connectors.oracle.oracle_connector import OracleConnector
 from infrastructure.adapters.out.connectors.mysql.mysql_connector import MySQLConnector
-from infrastructure.adapters.out.connectors.db2.db2_connector import DB2Connector
 from infrastructure.adapters.out.connectors.mongodb.mongodb_connector import MongoDBConnector
 from infrastructure.adapters.out.persistence.repositories.db_repository import DbRepository
 from infrastructure.adapters.out.persistence.utils.db_credentials_helper import get_db_credentials
@@ -105,12 +103,8 @@ def run_app():
             connector_instance_to_use = PostgreSQLConnector()
         elif selected_db_type_sidebar == "SQLServer":
             connector_instance_to_use = SQLServerConnector()
-        elif selected_db_type_sidebar == "Oracle":
-            connector_instance_to_use = OracleConnector()
         elif selected_db_type_sidebar == "MySQL":
             connector_instance_to_use = MySQLConnector()
-        elif selected_db_type_sidebar == "DB2":
-            connector_instance_to_use = DB2Connector()
         elif selected_db_type_sidebar == "MongoDB":
             connector_instance_to_use = MongoDBConnector()
         
